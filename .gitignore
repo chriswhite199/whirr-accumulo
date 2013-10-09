@@ -1,1 +1,7 @@
 target/
+/bin
+.checkstyle
+.project
+.classpath
+.settings/
+*~
