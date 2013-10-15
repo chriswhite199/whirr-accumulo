@@ -89,17 +89,17 @@ function install_accumulo() {
 
   ACCUMULO_HOME=/usr/local/`ls -1 /usr/local/ | grep accumulo | head -n 1`
   ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
-  cp $ACCUMULO_CONF/examples/512MB/standalone/* $ACCUMULO_CONF/
+  cp $ACCUMULO_CONF_DIR/examples/512MB/standalone/* $ACCUMULO_CONF_DIR/
 
   echo "export ACCUMULO_HOME=$ACCUMULO_HOME" >> /etc/profile
   echo 'export PATH=$JAVA_HOME/bin:$ACCUMULO_HOME/bin:$PATH' >> /etc/profile
 
   # detect if zookeeper has already been installed, if not download and unpack it
-  if [ -z "$ZOOKEEPER_HOME" || ! -d $ZOOKEEPER_HOME ]; then
+  if [[ -z "$ZOOKEEPER_HOME" || ! -d $ZOOKEEPER_HOME ]]; then
+    echo "Installing ZooKeeper from $ZOOKEEPER_TAR_URL"
     install_tarball $ZOOKEEPER_TAR_URL
     ZOOKEEPER_HOME=/usr/local/`ls -1 /usr/local/ | grep zookeeper | head -n 1`
     echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile
-    
   fi
 
   INSTALL_ACCUMULO_DONE=1

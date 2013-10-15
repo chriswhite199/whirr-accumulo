@@ -115,8 +115,16 @@ public class AccumuloMasterClusterActionHandler extends AccumuloClusterActionHan
 
         Configuration config = getConfiguration(clusterSpec);
 
+        String instanceName = conf.getString(AccumuloConstants.PROP_ACCUMULO_INSTANCE_NAME,
+                AccumuloConstants.INSTANCE_NAME);
+        String rootPassword = conf.getString(AccumuloConstants.PROP_ACCUMULO_ROOT_PASSWORD,
+                AccumuloConstants.ROOT_PASSWORD);
+
         addStatement(event, call("retry_helpers"));
-        addStatement(event, call(getConfigureFunction(config), AccumuloConstants.PARAM_QUORUM, zkCsv));
+        addStatement(
+                event,
+                call(getConfigureFunction(config), AccumuloConstants.PARAM_QUORUM, zkCsv,
+                        AccumuloConstants.PARAM_INSTANCE, instanceName, AccumuloConstants.PARAM_PASSWORD, rootPassword));
     }
 
     private List<String> getZookeepersCsv(Set<Instance> instances) {

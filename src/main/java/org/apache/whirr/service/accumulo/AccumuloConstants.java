@@ -44,7 +44,7 @@ public final class AccumuloConstants {
     public static final String PROP_ACCUMULO_INSTANCE_NAME = "accumulo.instance.name";
     public static final String PROP_ACCUMULO_ROOT_PASSWORD = "accumulo.root.password";
 
-    public static final String PROP_ACCUMULO_PORT_MASTER = "accumulo.port.master";
+    public static final String PROP_ACCUMULO_PORT_MASTER = "accumulo-site.master.port.client";
 
     private AccumuloConstants() {
     }

@@ -25,7 +25,7 @@ public class AccumuloConfigurationBuilder {
 
     static Configuration buildAccumuloSiteConfiguration(ClusterSpec clusterSpec, Cluster cluster, Configuration defaults)
             throws ConfigurationException, IOException {
-        Configuration config = build(clusterSpec, cluster, defaults, "hbase-site");
+        Configuration config = build(clusterSpec, cluster, defaults, "accumulo-site");
 
         config.setProperty("instance.zookeeper.host", ZooKeeperCluster.getHosts(cluster));
 

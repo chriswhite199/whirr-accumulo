@@ -31,7 +31,7 @@ function configure_accumulo() {
   MASTER_HOST=
   ZOOKEEKER_QUORUM=
   ACCUMULO_TAR_URL=
-  while getopts "u:i:p:" OPTION; do
+  while getopts "i:p:" OPTION; do
     case $OPTION in
     i)
       INSTANCE="$OPTARG"
@@ -39,31 +39,15 @@ function configure_accumulo() {
     p)
       PASSWORD="$OPTARG"
       ;;
-    u)
-      ACCUMULO_TAR_URL="$OPTARG"
-      ;;
     esac
   done
   
-  # assign default URL if no other given (optional)
-  ACCUMULO_TAR_URL=${ACCUMULO_TAR_URL:-http://archive.apache.org/dist/accumulo/1.5.0/accumulo-1.5.0-bin.tar.gz}
-  # derive details from the URL
-  ACCUMULO_TAR_FILE=${ACCUMULO_TAR_URL##*/}
-  # extract "version" or the name of the directory contained in the tarball,
-  # but since accumulo has used different namings use the directory instead.
-  ACCUMULO_VERSION=${ACCUMULO_TAR_URL%/*.tar.gz}
-  ACCUMULO_VERSION=${ACCUMULO_VERSION##*/}
-  # simple check that we have a proper URL or default to use filename
-  if [[ "${ACCUMULO_VERSION:0:8}" != "accumulo" ]]; then
-    ACCUMULO_VERSION=${ACCUMULO_TAR_FILE%.tar.gz}
-  fi
-  
   if [ -z "$ACCUMULO_HOME" ]; then
     ACCUMULO_HOME=/usr/local/`ls -1 /usr/local/ | grep accumulo | head -n 1`
-    
-    if [ -z "$ACCUMULO_CONF_DIR" ]; then
-      ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
-    fi
+  fi
+
+  if [ -z "$ACCUMULO_CONF_DIR" ]; then
+    ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
   fi
 
   case $CLOUD_PROVIDER in
