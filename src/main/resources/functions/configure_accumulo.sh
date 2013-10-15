@@ -58,8 +58,13 @@ function configure_accumulo() {
     ACCUMULO_VERSION=${ACCUMULO_TAR_FILE%.tar.gz}
   fi
   
-  ACCUMULO_HOME=`ls -1 /usr/local/ | grep accumulo | head -n 1`
-  ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
+  if [ -z "$ACCUMULO_HOME" ]; then
+    ACCUMULO_HOME=/usr/local/`ls -1 /usr/local/ | grep accumulo | head -n 1`
+    
+    if [ -z "$ACCUMULO_CONF_DIR" ]; then
+      ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
+    fi
+  fi
 
   case $CLOUD_PROVIDER in
   ec2 | aws-ec2 )

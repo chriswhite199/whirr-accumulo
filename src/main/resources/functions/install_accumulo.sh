@@ -87,7 +87,7 @@ function install_accumulo() {
 
   install_tarball $ACCUMULO_TAR_URL
 
-  ACCUMULO_HOME=`ls -1 /usr/local/ | grep accumulo | head -n 1`
+  ACCUMULO_HOME=/usr/local/`ls -1 /usr/local/ | grep accumulo | head -n 1`
   ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
   cp $ACCUMULO_CONF/examples/512MB/standalone/* $ACCUMULO_CONF/
 
@@ -97,7 +97,7 @@ function install_accumulo() {
   # detect if zookeeper has already been installed, if not download and unpack it
   if [ -z "$ZOOKEEPER_HOME" || ! -d $ZOOKEEPER_HOME ]; then
     install_tarball $ZOOKEEPER_TAR_URL
-    ZOOKEEPER_HOME=`ls -1 /usr/local/ | grep zookeeper | head -n 1`
+    ZOOKEEPER_HOME=/usr/local/`ls -1 /usr/local/ | grep zookeeper | head -n 1`
     echo "export ZOOKEEPER_HOME=$ZOOKEEPER_HOME" >> /etc/profile
     
   fi

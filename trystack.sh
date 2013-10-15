@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Test script for launching on trystack
+
+WHIRR_OPTS="--config target/trystack-accumulo.properties"
+
+if [ -z "$OS_USERNAME" ]; then
+	echo "OpenStack.rc env variable OS_USERNAME not detected"
+	exit 1
+elif [ -z "$OS_TENANT_NAME" ]; then
+	echo "OpenStack.rc env variable OS_TENANT_NAME not detected"
+	exit 1
+elif [ -z "$OS_AUTH_URL" ]; then
+	echo "OpenStack.rc env variable OS_AUTH_URL not detected"
+	exit 1
+elif [ -z "$OS_PASSWORD" ]; then
+	echo "OpenStack.rc env variable OS_PASSWORD not detected"
+	exit 1
+fi
+
+if [ -z "$WHIRR_HOME" ]; then
+	echo "WHIRR_HOME env variable not set"
+	exit 1
+elif [ ! -f $WHIRR_HOME/bin/whirr ]; then
+	echo "\$WHIRR_HOME/bin/whirr not found"
+	exit 1
+fi
+
+rm target/trystack-accumulo.properties
+
+cat << EOF > target/trystack-accumulo.properties
+whirr.provider=trystack-nova
+whirr.endpoint=$OS_AUTH_URL
+whirr.identity=$OS_TENANT_NAME:$OS_USERNAME
+whirr.credential=$OS_PASSWORD
+whirr.location-id=RegionOne
+whirr.image-id=RegionOne/5e809aa3-c95e-4241-8e6a-1d807804c313
+whirr.instance-templates=1 accumulo-master
+whirr.private-key-file=target/id_rsa_trystack
+whirr.cluster-name=accumulo
+EOF
+
+if [ ! -f target/id_rsa_trystack ]; then
+	echo "Generating SSH Key Pair"
+	ssh-keygen -P '' -t rsa -f target/id_rsa_trystack
+fi
+
+function start_cluster() {
+	echo "Starting cluster"
+	$WHIRR_HOME/bin/whirr launch-cluster $WHIRR_OPTS
+}
+
+function stop_cluster() {
+	echo "Stopping cluster"
+	$WHIRR_HOME/bin/whirr destroy-cluster $WHIRR_OPTS
+}
+
+function print_usage() {
+	echo "Usage: `basename $0` <start|stop>"
+}
+
+# Check some environment variables hav ebeen set
+
+action=$1
+
+if [ -z "$action" ]; then
+	print_usage
+	exit 1
+fi
+
+case $action in
+start)
+	start_cluster
+	;;
+stop)
+	stop_cluster
+	;;
+*)
+	print_usage
+	exit 1
+	;;
+esac
