@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 org.apache.whirr.service.accumulo.AccumuloMasterClusterActionHandler
-org.apache.whirr.service.accumulo.AccumuloTabletServerClusterActionHandler
-org.apache.whirr.service.accumulo.AccumuloGarbageCollectorClusterActionHandler
-org.apache.whirr.service.accumulo.AccumuloMonitorClusterActionHandler
-org.apache.whirr.service.accumulo.AccumuloTracerClusterActionHandler
+#org.apache.whirr.service.accumulo.AccumuloTabletServerClusterActionHandler
+#org.apache.whirr.service.accumulo.AccumuloGarbageCollectorClusterActionHandler
+#org.apache.whirr.service.accumulo.AccumuloMonitorClusterActionHandler
+#org.apache.whirr.service.accumulo.AccumuloTracerClusterActionHandler

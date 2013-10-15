@@ -57,7 +57,8 @@ function configure_accumulo() {
   if [[ "${ACCUMULO_VERSION:0:8}" != "accumulo" ]]; then
     ACCUMULO_VERSION=${ACCUMULO_TAR_FILE%.tar.gz}
   fi
-  ACCUMULO_HOME=/usr/local/$ACCUMULO_VERSION
+  
+  ACCUMULO_HOME=`ls -1 /usr/local/ | grep accumulo | head -n 1`
   ACCUMULO_CONF_DIR=$ACCUMULO_HOME/conf
 
   case $CLOUD_PROVIDER in
@@ -129,10 +130,10 @@ function start_ACCUMULO_master() {
     AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
   fi
 
-  $AS_HADOOP "$ACCUMULO_HOME/bin/accumulo init --instance-name $INSTANCE --instance-name --password $PASSWORD"
-  $AS_HADOOP "$ACCUMULO_HOME/bin/accumulo org.apache.accumulo.server.master.state.SetGoalState NORMAL"
+  #$AS_HADOOP "$ACCUMULO_HOME/bin/accumulo init --instance-name $INSTANCE --instance-name --password $PASSWORD"
+  #$AS_HADOOP "$ACCUMULO_HOME/bin/accumulo org.apache.accumulo.server.master.state.SetGoalState NORMAL"
 
-  start_ACCUMULO_daemon master
+  #start_ACCUMULO_daemon master
 }
 
 function start_ACCUMULO_daemon() {
