@@ -71,32 +71,52 @@ for (( x=0; x<$NODES; x++ )); do
 	done
 done
 
-# now replace the jcloud assigned private IP and hostnames with the docker IPs 
-# (can't use hostnames as they are not registered anywhere)
-for (( x=0; x<$NODES; x++ )); do
-	for (( s=0; s<${SCRIPTS[$x]}; s++ )); do
-		sed -i -f target/docker.sed target/${DOCKER_IPS[$x]}-$s.sh
+function run_node_scripts {
+	x=$1
+	SCRIPTS=$2
+	DOCKER_IP=$3
+	LOG=target/node-$x.log
+
+	echo "Starting node $x" > $LOG
+
+	for (( s=0; s<$SCRIPTS; s++ )); do
+		sed -i -f target/docker.sed target/$DOCKER_IP-$s.sh
 	done
 
-	chmod u+x target/${DOCKER_IPS[$x]}-*.sh
+	chmod u+x target/$DOCKER_IP-*.sh
 
 	# copy scripts (ignore unknown hosts and host key checking)
 	scp -i target/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-		target/${DOCKER_IPS[$x]}-*.sh root@${DOCKER_IPS[$x]}:/tmp
+		target/$DOCKER_IP-*.sh root@$DOCKER_IP:/tmp
 
-	for (( s=0; s<${SCRIPTS[$x]}; s++ )); do
+	for (( s=0; s<$SCRIPTS; s++ )); do
+		echo "-------------------------------------------------------------" >> $LOG
+		echo "Running script $s" >> $LOG
+
 		ssh -i target/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-			root@${DOCKER_IPS[$x]} /tmp/${DOCKER_IPS[$x]}-$s.sh "init"
+			root@$DOCKER_IP /tmp/$DOCKER_IP-$s.sh "init"
 
 		if [ $? -ne 0 ]; then
-			exit "Failed in running ${DOCKER_IPS[$x]}-$s.sh init"
+			echo "Failed in running $DOCKER_IP-$s.sh init"
+			return 1
 		fi
 
 		ssh -i target/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-			root@${DOCKER_IPS[$x]} /tmp/${DOCKER_IPS[$x]}-$s.sh "run"
+			root@$DOCKER_IP /tmp/$DOCKER_IP-$s.sh "run" >> $LOG
 
 		if [ $? -ne 0 ]; then
-			exit "Failed in running ${DOCKER_IPS[$x]}-$s.sh run"
+			echo "Failed in running $DOCKER_IP-$s.sh run"
+			return 1
 		fi
 	done
-done
+
+	return 0
+}
+
+export -f run_node_scripts
+
+# now replace the jcloud assigned private IP and hostnames with the docker IPs 
+# (can't use hostnames as they are not registered anywhere)
+for (( x=0; x<$NODES; x++ )); do
+	echo $x ${SCRIPTS[$x]} ${DOCKER_IPS[$x]}
+done | xargs -n 3 -P $NODES bash -c 'run_node_scripts "$@"' --
