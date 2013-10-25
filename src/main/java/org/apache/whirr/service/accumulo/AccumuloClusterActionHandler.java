@@ -45,4 +45,8 @@ public abstract class AccumuloClusterActionHandler extends ClusterActionHandlerS
     protected String getConfigureFunction(Configuration config) {
         return getConfigureFunction(config, "accumulo", AccumuloConstants.FUNCTION_CONFIGURE);
     }
+    
+    protected String getStartFunction(Configuration config) {
+        return getStartFunction(config, "accumulo", AccumuloConstants.FUNCTION_START);
+    }
 }

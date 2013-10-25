@@ -28,7 +28,7 @@ public class AccumuloClusterTest extends BaseServiceDryRunTest {
         // run on docker containers
 
         ClusterSpec cookbookWithDefaultRecipe = newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates",
-                "1 hadoop-namenode+hadoop-jobtracker+zookeeper, 1 hadoop-datanode+hadoop-tasktracker",
+                "1 hadoop-namenode+hadoop-jobtracker+zookeeper+accumulo-master, 1 hadoop-datanode+hadoop-tasktracker",
                 "whirr.hadoop.version", "1.2.1"));
         DryRun dryRun = launchWithClusterSpec(cookbookWithDefaultRecipe);
 

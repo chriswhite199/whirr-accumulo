@@ -24,6 +24,7 @@ public final class AccumuloConstants {
 
     public static final String FUNCTION_INSTALL = "install_accumulo";
     public static final String FUNCTION_CONFIGURE = "configure_accumulo";
+    public static final String FUNCTION_START = "start_accumulo";
 
     public static final String PARAM_QUORUM = "-q";
     public static final String PARAM_INSTANCE = "-i";

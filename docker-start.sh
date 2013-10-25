@@ -77,7 +77,7 @@ function run_node_scripts {
 	DOCKER_IP=$3
 	LOG=target/node-$x.log
 
-	echo "Starting node $x" > $LOG
+	echo "Starting node $x" 2>&1 1> $LOG
 
 	for (( s=0; s<$SCRIPTS; s++ )); do
 		sed -i -f target/docker.sed target/$DOCKER_IP-$s.sh
@@ -102,7 +102,7 @@ function run_node_scripts {
 		fi
 
 		ssh -i target/id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-			root@$DOCKER_IP /tmp/$DOCKER_IP-$s.sh "run" >> $LOG
+			root@$DOCKER_IP /tmp/$DOCKER_IP-$s.sh "run" 2>&1 1>> $LOG
 
 		if [ $? -ne 0 ]; then
 			echo "Failed in running $DOCKER_IP-$s.sh run"
@@ -115,8 +115,7 @@ function run_node_scripts {
 
 export -f run_node_scripts
 
-# now replace the jcloud assigned private IP and hostnames with the docker IPs 
-# (can't use hostnames as they are not registered anywhere)
+# Run the init scripts on each node in parallel
 for (( x=0; x<$NODES; x++ )); do
 	echo $x ${SCRIPTS[$x]} ${DOCKER_IPS[$x]}
 done | xargs -n 3 -P $NODES bash -c 'run_node_scripts "$@"' --

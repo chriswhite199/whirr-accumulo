@@ -89,49 +89,18 @@ function configure_accumulo() {
   chown -R hadoop:hadoop $ACCUMULO_LOG_DIR
 
   if [ $(echo "$ROLES" | grep "accumulo-master" | wc -l) -gt 0 ]; then
-    start_ACCUMULO_master
+    configure_accumulo_master $INSTANCE $PASSWORD
   fi
-
-  for role in $(echo "$ROLES" | tr "," "\n"); do
-    case $role in
-    accumulo-tabletserver)
-      start_ACCUMULO_daemon tserver "tablet server"
-      ;;
-    accumulo-gcserver)
-      start_ACCUMULO_daemon gc "garbage collector"
-      ;;
-    accumulo-tracerserver)
-      start_ACCUMULO_daemon tracer
-      ;;
-    accumulo-monitorserver)
-      start_ACCUMULO_daemon monitor
-      ;;
-    esac
-  done
 
   CONFIGURE_ACCUMULO_DONE=1
 }
 
-function start_ACCUMULO_master() {
+function configure_accumulo_master() {
   if which dpkg &> /dev/null; then
     AS_HADOOP="su -s /bin/bash - hadoop -c"
   elif which rpm &> /dev/null; then
     AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
   fi
 
-  #$AS_HADOOP "$ACCUMULO_HOME/bin/accumulo init --instance-name $INSTANCE --instance-name --password $PASSWORD"
-  #$AS_HADOOP "$ACCUMULO_HOME/bin/accumulo org.apache.accumulo.server.master.state.SetGoalState NORMAL"
-
-  #start_ACCUMULO_daemon master
+  $AS_HADOOP "$ACCUMULO_HOME/bin/accumulo init --instance-name $1 --instance-name --password $2"
 }
-
-function start_ACCUMULO_daemon() {
-  if which dpkg &> /dev/null; then
-    AS_HADOOP="su -s /bin/bash - hadoop -c"
-  elif which rpm &> /dev/null; then
-    AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
-  fi
-
-  $AS_HADOOP "$ACCUMULO_HOME/bin/start-server.sh $HOST $1 $2"
-}
-
