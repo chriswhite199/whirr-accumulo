@@ -27,7 +27,8 @@ public final class AccumuloConstants {
     public static final String FUNCTION_START = "start_accumulo";
 
     public static final String PARAM_QUORUM = "-q";
-    public static final String PARAM_INSTANCE = "-i";
+    public static final String PARAM_INSTANCE = "-n";
+    public static final String PARAM_IP = "-i";
     public static final String PARAM_PASSWORD = "-p";
     public static final String PARAM_ACC_TARBALL_URL = "-u";
     public static final String PARAM_ZK_TARBALL_URL = "-z";

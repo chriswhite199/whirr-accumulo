@@ -113,17 +113,9 @@ public class AccumuloMasterClusterActionHandler extends AccumuloClusterActionHan
         Set<Instance> ensemble = cluster.getInstancesMatching(role(ZooKeeperClusterActionHandler.ZOOKEEPER_ROLE));
         String zkCsv = Joiner.on(',').join(getZookeepersCsv(ensemble));
 
-        String instanceName = conf.getString(AccumuloConstants.PROP_ACCUMULO_INSTANCE_NAME,
-                AccumuloConstants.INSTANCE_NAME);
-        String rootPassword = conf.getString(AccumuloConstants.PROP_ACCUMULO_ROOT_PASSWORD,
-                AccumuloConstants.ROOT_PASSWORD);
-
         addStatement(event, call("retry_helpers"));
-        addStatement(
-                event,
-                call(getConfigureFunction(conf), Joiner.on(",").join(event.getInstanceTemplate().getRoles()),
-                        AccumuloConstants.PARAM_QUORUM, zkCsv, AccumuloConstants.PARAM_INSTANCE, instanceName,
-                        AccumuloConstants.PARAM_PASSWORD, rootPassword));
+        addStatement(event,
+                call(getConfigureFunction(conf), Joiner.on(",").join(event.getInstanceTemplate().getRoles())));
     }
 
     @Override
@@ -134,7 +126,16 @@ public class AccumuloMasterClusterActionHandler extends AccumuloClusterActionHan
         addStatement(event, call("retry_helpers"));
         addStatement(event, call("configure_hostnames"));
 
-        addStatement(event, call(getStartFunction(conf), Joiner.on(",").join(event.getInstanceTemplate().getRoles())));
+        String instanceName = conf.getString(AccumuloConstants.PROP_ACCUMULO_INSTANCE_NAME,
+                AccumuloConstants.INSTANCE_NAME);
+        String rootPassword = conf.getString(AccumuloConstants.PROP_ACCUMULO_ROOT_PASSWORD,
+                AccumuloConstants.ROOT_PASSWORD);
+
+        addStatement(
+                event,
+                call(getStartFunction(conf), Joiner.on(",").join(event.getInstanceTemplate().getRoles()),
+                        // AccumuloConstants.PARAM_IP, event.getInstanceTemplate().get
+                        AccumuloConstants.PARAM_INSTANCE, instanceName, AccumuloConstants.PARAM_PASSWORD, rootPassword));
     }
 
     private List<String> getZookeepersCsv(Set<Instance> instances) {

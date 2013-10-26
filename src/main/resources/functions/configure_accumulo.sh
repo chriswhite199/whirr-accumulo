@@ -26,22 +26,7 @@ function configure_accumulo() {
   
   ROLES=$1
   shift
-  
-  # get parameters
-  MASTER_HOST=
-  ZOOKEEKER_QUORUM=
-  ACCUMULO_TAR_URL=
-  while getopts "i:p:" OPTION; do
-    case $OPTION in
-    i)
-      INSTANCE="$OPTARG"
-      ;;
-    p)
-      PASSWORD="$OPTARG"
-      ;;
-    esac
-  done
-  
+    
   if [ -z "$ACCUMULO_HOME" ]; then
     ACCUMULO_HOME=/usr/local/`ls -1 /usr/local/ | grep accumulo | head -n 1`
   fi
@@ -88,19 +73,5 @@ function configure_accumulo() {
   ln -s $MOUNT/accumulo/logs $ACCUMULO_LOG_DIR
   chown -R hadoop:hadoop $ACCUMULO_LOG_DIR
 
-  if [ $(echo "$ROLES" | grep "accumulo-master" | wc -l) -gt 0 ]; then
-    configure_accumulo_master $INSTANCE $PASSWORD
-  fi
-
   CONFIGURE_ACCUMULO_DONE=1
-}
-
-function configure_accumulo_master() {
-  if which dpkg &> /dev/null; then
-    AS_HADOOP="su -s /bin/bash - hadoop -c"
-  elif which rpm &> /dev/null; then
-    AS_HADOOP="/sbin/runuser -s /bin/bash - hadoop -c"
-  fi
-
-  $AS_HADOOP "$ACCUMULO_HOME/bin/accumulo init --instance-name $1 --instance-name --password $2"
 }
