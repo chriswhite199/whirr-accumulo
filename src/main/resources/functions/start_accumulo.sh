@@ -102,5 +102,7 @@ function start_accumulo_service() {
   
   echo "Starting $SERVICE for $IP" >> /tmp/start-accumulo.log
   
-  $AS_HADOOP "${ACCUMULO_HOME}/bin/accumulo ${SERVICE} --address $PRIVATE_IP >${STDOUT} 2>${STDERR} &" 2>&1 1>> /tmp/start-accumulo.log
+  $AS_HADOOP bash<<BASH_END
+  ${ACCUMULO_HOME}/bin/accumulo ${SERVICE} --address $PRIVATE_IP &
+BASH_END
 }

@@ -1,7 +1,7 @@
 #/bin/bash
 
-set -v
-set -x
+#set -v
+#set -x
 
 PIPEWORK=$HOME/pipework/pipework
 
@@ -10,7 +10,7 @@ NODES=`grep NODES target/cluster.properties | gawk '{ print $2 }'`
 echo $NODES
 
 # docker info
-DOCKER_IMAGE=cswhite/sshd_openjdk-6
+DOCKER_IMAGE=sshd-openjdk6
 DOCKER_CMD="sudo docker"
 
 # generate ssh key pair
@@ -22,6 +22,7 @@ ssh-keygen -t rsa -P '' -f target/id_rsa
 # generate minimal dockerfile to inject ssh keypair into base image
 cat << EOF > target/Dockerfile
 FROM $DOCKER_IMAGE
+RUN mkdir -p /root/.ssh
 ADD id_rsa.pub /root/.ssh/authorized_keys
 RUN chmod go-rwx /root/.ssh/*
 RUN chown root:root -R /root/.ssh/*
@@ -114,6 +115,9 @@ function run_node_scripts {
 }
 
 export -f run_node_scripts
+
+# give time to start
+sleep 5s
 
 # Run the init scripts on each node in parallel
 for (( x=0; x<$NODES; x++ )); do
