@@ -50,7 +50,7 @@ function start_accumulo() {
   fi
   
   if [ -z "$ACCUMULO_LOG_DIR" ]; then
-    export ACCUMULO_LOG_DIR=$ACCUMULO_HOME/logs  
+    export ACCUMULO_LOG_DIR=/var/log/accumulo/logs  
   fi
 
   if [ $(echo "$ROLES" | grep "accumulo-master" | wc -l) -gt 0 ]; then
@@ -97,12 +97,14 @@ function start_accumulo_service() {
   
   SERVICE=$1
   
-  STDOUT=${ACCUMULO_LOG_DIR}/${SERVICE}_${PRIVATE_IP}.out
-  STDERR=${ACCUMULO_LOG_DIR}/${SERVICE}_${PRIVATE_IP}.err
+  HOSTNAME=`hostname`
+  STDOUT=${ACCUMULO_LOG_DIR}/${SERVICE}_${HOSTNAME}.out
+  STDERR=${ACCUMULO_LOG_DIR}/${SERVICE}_${HOSTNAME}.err
   
-  echo "Starting $SERVICE for $IP" >> /tmp/start-accumulo.log
+  echo "Starting $SERVICE for $PRIVATE_IP" >> /tmp/start-accumulo.log
+  echo "$SERVICE stdout: ${STDOUT}" >> /tmp/start-accumulo.log
+  echo "$SERVICE stderr: ${STDERR}" >> /tmp/start-accumulo.log
   
-  $AS_HADOOP bash<<BASH_END
-  ${ACCUMULO_HOME}/bin/accumulo ${SERVICE} --address $PRIVATE_IP &
-BASH_END
+  # nohup and no hanging descriptors
+  $AS_HADOOP "exec nohup ${ACCUMULO_HOME}/bin/accumulo ${SERVICE} --address $PRIVATE_IP" >$STDOUT 2>$STDERR </dev/null &
 }
