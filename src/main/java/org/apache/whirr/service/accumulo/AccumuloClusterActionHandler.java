@@ -34,7 +34,7 @@ import org.apache.whirr.Cluster.Instance;
 import org.apache.whirr.ClusterSpec;
 import org.apache.whirr.service.ClusterActionEvent;
 import org.apache.whirr.service.ClusterActionHandlerSupport;
-import org.apache.whirr.service.FirewallManager.Rule;
+import org.apache.whirr.service.FirewallManager;
 import org.apache.whirr.service.zookeeper.ZooKeeperClusterActionHandler;
 import org.jclouds.scriptbuilder.domain.Statement;
 
@@ -109,32 +109,8 @@ public abstract class AccumuloClusterActionHandler extends ClusterActionHandlerS
 
         Configuration conf = getConfiguration(clusterSpec);
 
-        // add some service firewall holes - these may need to be pushed down to the subclasses
-        event.getFirewallManager().addRule(
-                Rule.create()
-                        .destination(role(AccumuloMasterClusterActionHandler.ROLE))
-                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_MASTER,
-                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_MASTER)));
-        event.getFirewallManager().addRule(
-                Rule.create()
-                        .destination(role(AccumuloTabletServerClusterActionHandler.ROLE))
-                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_TSERVER,
-                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_TSERVER)));
-        event.getFirewallManager().addRule(
-                Rule.create()
-                        .destination(role(AccumuloGCClusterActionHandler.ROLE))
-                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_GC,
-                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_GC)));
-        event.getFirewallManager().addRule(
-                Rule.create()
-                        .destination(role(AccumuloMonitorClusterActionHandler.ROLE))
-                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_MONITOR,
-                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_MONITOR)));
-        event.getFirewallManager().addRule(
-                Rule.create()
-                        .destination(role(AccumuloTracerClusterActionHandler.ROLE))
-                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_TRACER,
-                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_TRACER)));
+        // add some service firewall holes - delegate to subclasses
+        configureFirewallRules(event.getFirewallManager(), conf);
 
         handleFirewallRules(event);
 
@@ -163,6 +139,17 @@ public abstract class AccumuloClusterActionHandler extends ClusterActionHandlerS
         addStatement(event, call("retry_helpers"));
         addStatement(event,
                 call(getConfigureFunction(conf), Joiner.on(",").join(event.getInstanceTemplate().getRoles())));
+    }
+
+    /**
+     * Implementations define the firewall rules, if any
+     * 
+     * @param firewallManager
+     * @param conf 
+     * @throws IOException 
+     */
+    protected void configureFirewallRules(FirewallManager firewallManager, Configuration conf) throws IOException {
+        // default is no-op
     }
 
     @Override

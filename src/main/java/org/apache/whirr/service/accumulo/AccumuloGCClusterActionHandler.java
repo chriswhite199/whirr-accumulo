@@ -18,6 +18,13 @@
 
 package org.apache.whirr.service.accumulo;
 
+import static org.apache.whirr.RolePredicates.role;
+
+import java.io.IOException;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.whirr.service.FirewallManager;
+import org.apache.whirr.service.FirewallManager.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,5 +36,14 @@ public class AccumuloGCClusterActionHandler extends AccumuloClusterActionHandler
     @Override
     public String getRole() {
         return ROLE;
+    }
+
+    @Override
+    protected void configureFirewallRules(FirewallManager firewallManager, Configuration conf) throws IOException {
+        firewallManager.addRule(
+                Rule.create()
+                        .destination(role(AccumuloGCClusterActionHandler.ROLE))
+                        .port(conf.getInt(AccumuloConstants.PROP_ACCUMULO_PORT_GC,
+                                AccumuloConstants.DEFAULT_ACCUMULO_PORT_GC)));
     }
 }
