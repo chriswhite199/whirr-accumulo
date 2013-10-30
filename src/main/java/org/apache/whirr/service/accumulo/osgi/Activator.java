@@ -21,7 +21,11 @@ package org.apache.whirr.service.accumulo.osgi;
 import java.util.Properties;
 
 import org.apache.whirr.service.ClusterActionHandler;
+import org.apache.whirr.service.accumulo.AccumuloGCClusterActionHandler;
+import org.apache.whirr.service.accumulo.AccumuloTracerClusterActionHandler;
 import org.apache.whirr.service.accumulo.AccumuloMasterClusterActionHandler;
+import org.apache.whirr.service.accumulo.AccumuloMonitorClusterActionHandler;
+import org.apache.whirr.service.accumulo.AccumuloTabletServerClusterActionHandler;
 import org.jclouds.scriptbuilder.functionloader.osgi.BundleFunctionLoader;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -32,6 +36,18 @@ public class Activator implements BundleActivator {
 
     private final ClusterActionHandler masterClusterActionHandler = new AccumuloMasterClusterActionHandler();
     private ServiceRegistration masterRegistration;
+
+    private final ClusterActionHandler tserverClusterActionHandler = new AccumuloTabletServerClusterActionHandler();
+    private ServiceRegistration tserverRegistration;
+
+    private final ClusterActionHandler gcClusterActionHandler = new AccumuloGCClusterActionHandler();
+    private ServiceRegistration gcRegistration;
+
+    private final ClusterActionHandler monitorClusterActionHandler = new AccumuloMonitorClusterActionHandler();
+    private ServiceRegistration monitorRegistration;
+
+    private final ClusterActionHandler tracerClusterActionHandler = new AccumuloTracerClusterActionHandler();
+    private ServiceRegistration tracerRegistration;
 
     /**
      * Called when this bundle is started so the Framework can perform the
@@ -57,15 +73,51 @@ public class Activator implements BundleActivator {
         functionLoader.start();
 
         Properties masterProps = new Properties();
-        masterProps.put("name", "accumulo-master");
+        masterProps.put("name", AccumuloMasterClusterActionHandler.ROLE);
         masterRegistration = context.registerService(ClusterActionHandler.class.getName(), masterClusterActionHandler,
                 masterProps);
+
+        Properties tserverProps = new Properties();
+        tserverProps.put("name", AccumuloTabletServerClusterActionHandler.ROLE);
+        tserverRegistration = context.registerService(ClusterActionHandler.class.getName(),
+                tserverClusterActionHandler, tserverProps);
+        
+        Properties monitorProps = new Properties();
+        monitorProps.put("name", AccumuloMonitorClusterActionHandler.ROLE);
+        monitorRegistration = context.registerService(ClusterActionHandler.class.getName(),
+                monitorClusterActionHandler, monitorProps);
+        
+        Properties gcProps = new Properties();
+        gcProps.put("name", AccumuloGCClusterActionHandler.ROLE);
+        gcRegistration = context.registerService(ClusterActionHandler.class.getName(),
+                gcClusterActionHandler, gcProps);
+        
+        Properties loggerProps = new Properties();
+        loggerProps.put("name", AccumuloTracerClusterActionHandler.ROLE);
+        tracerRegistration = context.registerService(ClusterActionHandler.class.getName(),
+                tracerClusterActionHandler, loggerProps);
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
         if (masterRegistration != null) {
             masterRegistration.unregister();
+        }
+
+        if (tserverRegistration != null) {
+            tserverRegistration.unregister();
+        }
+
+        if (gcRegistration != null) {
+            gcRegistration.unregister();
+        }
+
+        if (monitorRegistration != null) {
+            monitorRegistration.unregister();
+        }
+
+        if (tracerRegistration != null) {
+            tracerRegistration.unregister();
         }
 
         if (functionLoader != null) {

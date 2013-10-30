@@ -47,6 +47,15 @@ public final class AccumuloConstants {
     public static final String PROP_ACCUMULO_ROOT_PASSWORD = "accumulo.root.password";
 
     public static final String PROP_ACCUMULO_PORT_MASTER = "accumulo-site.master.port.client";
+    public static final int DEFAULT_ACCUMULO_PORT_MASTER = 9999;
+    public static final String PROP_ACCUMULO_PORT_TSERVER = "accumulo-site.tserver.port.client";
+    public static final int DEFAULT_ACCUMULO_PORT_TSERVER = 9997;
+    public static final String PROP_ACCUMULO_PORT_GC = "accumulo-site.gc.port.client";
+    public static final int DEFAULT_ACCUMULO_PORT_GC = 50091;
+    public static final String PROP_ACCUMULO_PORT_MONITOR = "accumulo-site.monitor.port.client";
+    public static final int DEFAULT_ACCUMULO_PORT_MONITOR = 50095;
+    public static final String PROP_ACCUMULO_PORT_TRACER = "accumulo-site.tracer.port.client";
+    public static final int DEFAULT_ACCUMULO_PORT_TRACER = 12234;
 
     private AccumuloConstants() {
     }

@@ -21,13 +21,15 @@ package org.apache.whirr.service.accumulo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AccumuloMasterClusterActionHandler extends AccumuloClusterActionHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(AccumuloMasterClusterActionHandler.class);
+public class AccumuloTracerClusterActionHandler extends AccumuloClusterActionHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(AccumuloTracerClusterActionHandler.class);
 
-    public static final String ROLE = "accumulo-master";
+    public static final String ROLE = "accumulo-tracer";
 
     @Override
     public String getRole() {
         return ROLE;
     }
+
+    
 }

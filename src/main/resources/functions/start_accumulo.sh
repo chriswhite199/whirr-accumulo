@@ -29,9 +29,6 @@ function start_accumulo() {
   # get parameters
   while getopts "i:n:p:" OPTION; do
     case $OPTION in
-    i)
-      IP="$OPTARG"
-      ;;
     n)
       INSTANCE="$OPTARG"
       ;;
@@ -60,16 +57,19 @@ function start_accumulo() {
   for role in $(echo "$ROLES" | tr "," "\n"); do
     case $role in
     accumulo-master)
-      start_accumulo_service master ${IP}
+      start_accumulo_service master
       ;;
     accumulo-tserver)
-      start_accumulo_service tserver ${IP}
+      start_accumulo_service tserver
       ;;
     accumulo-gc)
-      start_accumulo_service gc ${IP}
+      start_accumulo_service gc
       ;;
-    accumulo-logger)
-      start_accumulo_service logger ${IP}
+    accumulo-monitor)
+      start_accumulo_service monitor
+      ;;      
+    accumulo-tracer)
+      start_accumulo_service tracer
       ;;
     esac
   done
@@ -105,6 +105,6 @@ function start_accumulo_service() {
   echo "$SERVICE stdout: ${STDOUT}" >> /tmp/start-accumulo.log
   echo "$SERVICE stderr: ${STDERR}" >> /tmp/start-accumulo.log
   
-  # nohup and no hanging descriptors
+  # nohup and no hanging descriptors by redirecting inputs and output / error
   $AS_HADOOP "exec nohup ${ACCUMULO_HOME}/bin/accumulo ${SERVICE} --address $PRIVATE_IP" >$STDOUT 2>$STDERR </dev/null &
 }

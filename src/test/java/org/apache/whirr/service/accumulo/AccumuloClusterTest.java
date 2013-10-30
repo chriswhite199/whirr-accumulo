@@ -27,9 +27,11 @@ public class AccumuloClusterTest extends BaseServiceDryRunTest {
         // override the default behaviour to create some scripts which we can
         // run on docker containers
 
-        ClusterSpec cookbookWithDefaultRecipe = newClusterSpecForProperties(ImmutableMap.of("whirr.instance-templates",
-                "1 hadoop-namenode+hadoop-jobtracker+zookeeper+accumulo-master, 1 hadoop-datanode+hadoop-tasktracker",
-                "whirr.hadoop.version", "1.2.1"));
+        ClusterSpec cookbookWithDefaultRecipe = newClusterSpecForProperties(ImmutableMap
+                .of("whirr.instance-templates",
+                        "1 hadoop-namenode+hadoop-jobtracker+zookeeper+accumulo-master+accumulo-monitor+accumulo-gc, 1 hadoop-datanode+hadoop-tasktracker+accumulo-tserver+accumulo-tracer",
+                        "whirr.hadoop.version", "1.2.1", "whirr.zookeeper.tarball.url",
+                        "http://archive.apache.org/dist/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz", "hadoop-hdfs.dfs.durable.sync", "true"));
         DryRun dryRun = launchWithClusterSpec(cookbookWithDefaultRecipe);
 
         File tgtDir = new File("target");
@@ -56,10 +58,8 @@ public class AccumuloClusterTest extends BaseServiceDryRunTest {
 
             i++;
 
-            nodePropMap.put(String.format("%d\tPUBLIC_IP", n), nodeMeta.getPublicAddresses().iterator()
-                    .next());
-            nodePropMap.put(String.format("%d\tPRIVATE_IP", n), nodeMeta.getPrivateAddresses().iterator()
-                    .next());
+            nodePropMap.put(String.format("%d\tPUBLIC_IP", n), nodeMeta.getPublicAddresses().iterator().next());
+            nodePropMap.put(String.format("%d\tPRIVATE_IP", n), nodeMeta.getPrivateAddresses().iterator().next());
             nodePropMap.put(String.format("%d\tHOSTNAME", n), nodeMeta.getName());
             nodePropMap.put(String.format("%d\tSCRIPTS", n), String.valueOf(i));
         }
